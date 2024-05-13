@@ -5,7 +5,7 @@ from users.models import Patient, Doctor
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ['email', 'password', 'name', 'last_name', 'gender', 'phone', 'is_staff', 'is_active']
+        fields = ['id','email', 'password', 'name', 'last_name', 'gender', 'phone', 'is_staff', 'is_active']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):

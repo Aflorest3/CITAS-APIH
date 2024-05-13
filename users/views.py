@@ -6,11 +6,27 @@ from users.models import Patient, Doctor
 class PatientView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PatientSerializer
     queryset = Patient.objects.all()
+    
+    def perform_update(self, serializer):
+        password = self.request.data.get('password')
+        instance = serializer.save()
+        if password:
+            instance.set_password(password)
+            instance.save()
+            
 
 class DoctorView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = DoctorSerializer
     queryset = Doctor.objects.all()
-
+    
+    def perform_update(self, serializer):
+        password = self.request.data.get('password')
+        instance = serializer.save()
+        if password:
+            instance.set_password(password)
+            instance.save()
+    
+    
 class PatientListView(generics.ListAPIView):
     serializer_class = PatientSerializer
     
@@ -26,7 +42,21 @@ class DoctorListView(generics.ListAPIView):
 class DoctorCreateView(CreateAPIView):
     serializer_class = DoctorSerializer
     queryset = Doctor.objects.all()
+    
+    def perform_create(self, serializer):
+        password = self.request.data.get('password')
+        instance = serializer.save()
+        if password:
+            instance.set_password(password)
+            instance.save()
 
 class PatientCreateView(CreateAPIView):
     serializer_class = PatientSerializer
     queryset = Patient.objects.all()
+    
+    def perform_create(self, serializer):
+        password = self.request.data.get('password')
+        instance = serializer.save()
+        if password:
+            instance.set_password(password)
+            instance.save()
