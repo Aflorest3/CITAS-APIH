@@ -1,10 +1,9 @@
 from django.urls import path
-from rest_framework.routers import DefaultRouter
-from .views import AppointmentViewSet, AppointmentFilterByDateView
+from .views import AppointmentListView, AppointmentCreateView, PatientAppointmentListView, DoctorAppointmentListView
 
 urlpatterns = [
-    path('create/', AppointmentViewSet.as_view({'post': 'create'}), name='appointment-create'),
-    path('<int:pk>/', AppointmentViewSet.as_view({'get': 'retrieve'}), name='appointment-detail'),
-    path('', AppointmentViewSet.as_view({'get': 'list'}), name='appointment-list'),
-    path('filter-by-date/', AppointmentFilterByDateView.as_view(), name='appointment-filter-by-date'),
+    path('appointments/list/', AppointmentListView.as_view(), name='appointment-list'),
+    path('appointments/create/<int:doctor_id>/', AppointmentCreateView.as_view(), name='appointment-create'),
+    path('patient/appointments/', PatientAppointmentListView.as_view(), name='patient-appointments'),
+    path('doctor/appointments/', DoctorAppointmentListView.as_view(), name='doctor-appointments'),
 ]

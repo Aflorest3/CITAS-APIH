@@ -1,37 +1,44 @@
-from rest_framework import viewsets, status
-from rest_framework.response import Response
-from .models import Appointment
-from rest_framework.views import APIView
+from rest_framework import generics
+from .models import Appointment, Doctor
 from .serializers import AppointmentSerializer
-from datetime import datetime
+from rest_framework.permissions import IsAuthenticated
 
-class AppointmentViewSet(viewsets.ModelViewSet):
-    serializer_class = AppointmentSerializer
+class AppointmentListView(generics.ListAPIView):
     queryset = Appointment.objects.all()
+    serializer_class = AppointmentSerializer
+    #permission_classes = [IsAuthenticated]
+
+class AppointmentCreateView(generics.CreateAPIView):
+    queryset = Appointment.objects.all()
+    serializer_class = AppointmentSerializer
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        users_id = self.request.data.get('users')
-        if users_id:
-            serializer.save(users_id=users_id)
-        else:
-            return Response({"error": "User ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-
-class AppointmentFilterByDateView(APIView):
-    def get(self, request):
-        # Obtenemos la fecha de la solicitud (si se proporciona)
-        fecha_str = request.query_params.get('fecha', None)
-        print(f"Fecha recibida: {fecha_str}")  # Imprime la fecha recibida
-        if fecha_str:
-            # Convertimos la cadena de texto a un objeto de fecha
-            fecha = datetime.strptime(fecha_str, '%Y-%m-%d').date()
-            print(f"Fecha convertida: {fecha}")  # Imprime la fecha convertida
-            # Filtramos las citas por fecha si se proporciona una fecha válida
-            queryset = Appointment.objects.filter(date=fecha)
-            print(f"Citas filtradas: {queryset}")  # Imprime las citas filtradas
-            serializer = AppointmentSerializer(queryset, many=True)
-            return Response(serializer.data)
-        else:
-            return Response({"error": "Fecha parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+        doctor_id = self.kwargs.get('doctor_id')
+        doctor = Doctor.objects.get(id=doctor_id)
+        serializer.save(patient=self.request.user.patient, doctor=doctor)
 
 
-    # ruta para usar el filtro http://127.0.0.1:8000/appointments/?fecha=2024-04-22
+class PatientAppointmentListView(generics.ListAPIView):
+    serializer_class = AppointmentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Esta vista debería devolver una lista de todas las citas
+        para el paciente que está actualmente autenticado.
+        """
+        user = self.request.user
+        return Appointment.objects.filter(patient=user.patient)
+
+class DoctorAppointmentListView(generics.ListAPIView):
+    serializer_class = AppointmentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Esta vista debería devolver una lista de todas las citas
+        para el doctor que está actualmente autenticado.
+        """
+        user = self.request.user
+        return Appointment.objects.filter(doctor=user.doctor)

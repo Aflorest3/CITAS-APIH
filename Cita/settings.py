@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'drf_spectacular',
     'appointments.apps.AppointmentsConfig',
-    'notification.apps.NotificationConfig',
     'rest_framework_simplejwt',
 ]
 
@@ -83,7 +82,7 @@ SIMPLE_JWT = {
     "JTI_CLAIM": "jti",
 
     "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
-    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
+    "SLIDING_TOKEN_LIFETIME": timedelta(days=2),
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
 
     "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
