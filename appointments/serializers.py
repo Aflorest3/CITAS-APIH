@@ -22,6 +22,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
         fields = ['id', 'doctor', 'patient', 'date', 'observation', 'time', 'is_active']
         read_only_fields = ['doctor', 'patient']
 
-    def create(self, validated_data):
-        patient = self.context['request'].user.patient
-        return Appointment.objects.create(patient=patient, **validated_data)
+def create(self, validated_data):
+    patient = self.context['request'].user.patient
+    validated_data.pop('patient', None)  
+    return Appointment.objects.create(patient=patient, **validated_data)
