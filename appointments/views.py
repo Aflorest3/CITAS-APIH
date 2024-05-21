@@ -18,6 +18,14 @@ class AppointmentCreateView(generics.CreateAPIView):
         doctor = Doctor.objects.get(id=doctor_id)
         serializer.save(patient=self.request.user.patient, doctor=doctor)
 
+class AppointmentUpdateView(generics.UpdateAPIView):
+    queryset = Appointment.objects.all()
+    serializer_class = AppointmentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_update(self, serializer):
+        # Si necesitas realizar alguna acción adicional antes de guardar, hazlo aquí
+        serializer.save()
 
 class PatientAppointmentListView(generics.ListAPIView):
     serializer_class = AppointmentSerializer
