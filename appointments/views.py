@@ -1,7 +1,7 @@
 from rest_framework import generics
-from .models import Appointment, Doctor
-from .serializers import AppointmentSerializer
 from rest_framework.permissions import IsAuthenticated
+from .models import Appointment, Doctor
+from .serializers import AppointmentSerializer, DoctorDetailSerializer, PatientDetailSerializer
 
 class AppointmentListView(generics.ListAPIView):
     queryset = Appointment.objects.all()
@@ -31,10 +31,6 @@ class PatientAppointmentListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        """
-        Esta vista debería devolver una lista de todas las citas
-        para el paciente que está actualmente autenticado.
-        """
         user = self.request.user
         return Appointment.objects.filter(patient=user.patient)
 
@@ -43,9 +39,5 @@ class DoctorAppointmentListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        """
-        Esta vista debería devolver una lista de todas las citas
-        para el doctor que está actualmente autenticado.
-        """
         user = self.request.user
         return Appointment.objects.filter(doctor=user.doctor)
