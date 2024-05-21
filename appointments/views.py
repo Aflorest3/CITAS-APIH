@@ -24,7 +24,6 @@ class AppointmentUpdateView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_update(self, serializer):
-        # Si necesitas realizar alguna acción adicional antes de guardar, hazlo aquí
         serializer.save()
 
 class PatientAppointmentListView(generics.ListAPIView):

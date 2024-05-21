@@ -13,18 +13,29 @@ class PatientSerializer(serializers.ModelSerializer):
         fields = ['name', 'last_name']
         
 
+class PatientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Patient
+        fields = ['name', 'last_name']
+
 class AppointmentSerializer(serializers.ModelSerializer):
     doctor = DoctorSerializer(read_only=True)
     patient = PatientSerializer(read_only=True)
-    doctor_id = serializers.PrimaryKeyRelatedField(queryset=Doctor.objects.all(), source='doctor', write_only=True)
     is_active_display = serializers.SerializerMethodField()
-    
+    doctor_id = serializers.IntegerField(write_only=True, required=False)
+
     class Meta:
         model = Appointment
-        fields = ['id', 'doctor', 'doctor_id', 'patient', 'date', 'observation', 'time', 'is_active', 'is_active_display']
-    
+        fields = ['id', 'doctor', 'patient', 'date', 'observation', 'time', 'is_active', 'is_active_display', 'doctor_id']
+
     def get_is_active_display(self, obj):
         return obj.get_is_active_display()
+
+    def update(self, instance, validated_data):
+        doctor_id = validated_data.pop('doctor_id', None)
+        if doctor_id:
+            instance.doctor = Doctor.objects.get(id=doctor_id)
+        return super().update(instance, validated_data)
 
     def validate(self, data):
         if self.instance and self.instance.patient != self.context['request'].user.patient:
