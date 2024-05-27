@@ -4,7 +4,7 @@ from .models import Appointment, Doctor, Patient
 class DoctorDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Doctor
-        fields = ['name', 'last_name']
+        fields = ['id', 'name', 'last_name']
 
 class PatientDetailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,6 +24,12 @@ class AppointmentSerializer(serializers.ModelSerializer):
     def get_is_active_display(self, obj) -> str:
         return obj.get_is_active_display()
 
+    def create(self, validated_data):
+        patient = self.context['request'].user.patient
+        doctor_id = validated_data.pop('doctor_id', None)
+        doctor = Doctor.objects.get(id=doctor_id) if doctor_id else None
+        return Appointment.objects.create(patient=patient, doctor=doctor, **validated_data)
+
     def update(self, instance, validated_data):
         doctor_id = validated_data.pop('doctor_id', None)
         if doctor_id:
@@ -34,8 +40,3 @@ class AppointmentSerializer(serializers.ModelSerializer):
         if self.instance and self.instance.patient != self.context['request'].user.patient:
             raise serializers.ValidationError("No tienes permiso para editar esta cita.")
         return data
-
-def create(self, validated_data):
-    patient = self.context['request'].user.patient
-    validated_data.pop('patient', None)  
-    return Appointment.objects.create(patient=patient, **validated_data)

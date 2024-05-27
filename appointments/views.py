@@ -1,12 +1,12 @@
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from .models import Appointment, Doctor
-from .serializers import AppointmentSerializer, DoctorDetailSerializer, PatientDetailSerializer
+from .serializers import AppointmentSerializer
 
 class AppointmentListView(generics.ListAPIView):
     queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializer
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 class AppointmentCreateView(generics.CreateAPIView):
     queryset = Appointment.objects.all()
@@ -22,9 +22,6 @@ class AppointmentUpdateView(generics.UpdateAPIView):
     queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializer
     permission_classes = [IsAuthenticated]
-
-    def perform_update(self, serializer):
-        serializer.save()
 
 class PatientAppointmentListView(generics.ListAPIView):
     serializer_class = AppointmentSerializer
