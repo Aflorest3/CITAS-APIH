@@ -25,18 +25,27 @@ class AppointmentSerializer(serializers.ModelSerializer):
         return obj.get_is_active_display()
 
     def create(self, validated_data):
+        # Excluye patient y doctor de validated_data para evitar duplicación
+        validated_data.pop('patient', None)
+        validated_data.pop('doctor', None)
+        
+        # Recupera patient y doctor del contexto
         patient = self.context['request'].user.patient
         doctor_id = validated_data.pop('doctor_id', None)
         doctor = Doctor.objects.get(id=doctor_id) if doctor_id else None
+        
+        # Crea la cita con los valores adecuados
         return Appointment.objects.create(patient=patient, doctor=doctor, **validated_data)
 
     def update(self, instance, validated_data):
+        # Maneja doctor_id de manera adecuada durante la actualización
         doctor_id = validated_data.pop('doctor_id', None)
         if doctor_id:
             instance.doctor = Doctor.objects.get(id=doctor_id)
         return super().update(instance, validated_data)
 
     def validate(self, data):
+        # Valida que el paciente sea el correcto
         if self.instance and self.instance.patient != self.context['request'].user.patient:
             raise serializers.ValidationError("No tienes permiso para editar esta cita.")
         return data
